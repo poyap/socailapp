@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}
+Upddate images info
+{% endblock %}
+{% block content %}
+<style>
+    img{
+        width: 100%;
+    }
+</style>
+{% if messages %}
+{% for message in message %}
+<div class="alert alert-warning alert-dismissible fade show mt-5" role="alert">
+    {{message}}    
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{% endfor %}
+{% endif %}
+<h1>Update your image information...</h1>
+<hr>    
+<div class="row">
+    <div class="col-6">
+        <img src="{{ image.image.url }}" class="image-preview w-75">
+    </div>
+    <div class="col-6">
+        <form method="POST">{% csrf_token %}   
+            {{form.as_p}}
+            <button type="submit">Update</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}
+bookmark an image
+{% endblock %}
+{% block content %}
+<style>
+    img{
+        width: 100%;
+    }
+</style>
+<h1>Bookmark an image</h1>
+<hr>    
+<div class="row">
+    <div class="col-6">
+        <img src="{{ request.GET.url }}" class="image-preview w-75">
+    </div>
+    <div class="col-6">
+        <form method="POST">{% csrf_token %}
+            {{form.as_p}}
+            <button type="submit">Bookmark it!</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}
+Delete an image
+{% endblock %}
+{% block content %}
+<style>
+    img{
+        width: 100%;
+    }
+</style>
+<h1>Are you sure you want to delete "{{image.title}}"</h1>
+<hr>    
+<div class="row">
+    <div class="col-6">
+        <img src="{{ image.image.url }}" class="image-preview w-75">
+    </div>
+    <div class="col-6">
+        <form method="POST">{% csrf_token %}   
+            <button type="submit">Delete</button>
+            <a href="{% url 'images:user_images' %}">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

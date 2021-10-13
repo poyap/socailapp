@@ -1,0 +1,33 @@
+
+{% extends 'base.html' %}{% load thumbnail %}
+{% block title %}
+{{request.user.title}} images
+{% endblock %}
+{% block content %}
+{% if messages %}
+{% for message in message %}
+<div class="alert alert-warning alert-dismissible fade show mt-5" role="alert">
+    {{message}}    
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{% endfor %}
+{% endif %}
+{% for image in images %}
+<div class="float-left border m-1">
+        <a href="{{ image.get_absolute_url }}">
+            <img src="{{ image.image.url }}" alt="image">
+        </a>
+    <div class="info text-wrap">
+        <a href="{{ image.get_absolute_url }}" class="title">
+            {{ image.title|slice:'40' }}
+        </a>
+    </div>
+    <div class="image-footer">
+        <a href="{% url 'images:delete' %}">Delete</a>
+        <a href="{% url 'images:edit' %}">Edit</a>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

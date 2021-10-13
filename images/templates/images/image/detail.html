@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% block title %}
+{{image.title}}
+{% endblock %}
+<link rel="stylesheet" href="{% block link %}/static/css/detail.css"{% endblock %}>
+{% block content %}
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-warning alert-dismissible fade show mt-5" role="alert">
+    {{message}}    
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+{% endfor %}
+{% endif %}
+<h1>{{image.title}}</h1>
+<hr>    
+<div class="row">
+    <div class="col-6">
+        <a href="{{ image.image.url }}">
+            <img src="{% thumbnail image.image '300x0' quality=100 %}" class="image-detail">
+        </a>
+        {% with total_likes=image.likes.count likes=image.likes.all %}
+    </div>
+    <div class="col-6 image-info">
+        <div>
+            <span class="count"> 
+            <span class='total'>{{total_likes}}</span>
+            like{{ total_likes|pluralize }}
+            </span>
+            <div class="total-view">
+                {{total_views}} view{{ total_views|pluralize }}
+            </div>
+            <a href="#" data-id="{{ image.id }}" data-action='{% if request.user in likes %}un{% endif %}like' class='like button'>{% if request.user not in likes %}Like{% else %}Unlike{% endif %}</a>
+        </div>
+        <p>{{image.description|linebreaks}}</p>
+       
+    </div>
+</div>
+<hr>
+<h4>People who liked this photo...</h4>
+<div class="image-likes border float-left" >
+    {% for user in likes %}
+    <img src="{{user.profile.photo.url}}" alt="profile picture">
+    <br>
+    <p>{{ user.first_name }}</p>
+    {% empty %}
+    <p>nobody likes this images yet.</p>
+    {% endfor %}
+</div>
+{% endwith %}
+{% endblock %}
+{% block domready %}
+    $('a.like').click(function(e){
+        e.preventDefault();
+        $.post(
+            '{% url "images:like" %}',
+            {
+                id: $(this).data('id'), 
+                action: $(this).data('action')
+            },
+            function(data){
+                if(data['status']=='ok'){
+                    var previous_action = $('a.like').data('action');
+                    //toggle data action
+                    $('a.like').data('action',previous_action =='like'?'unlike':'like');
+
+                    //toggle link text
+                    $('a.like').text(previous_action=='like' ? 'Unlike':'Like');
+
+                    //updating total likes
+                    var previous_likes = parseInt($('span.count .total').text());
+                    $('span.count .total').text(previous_action == 'like'? previous_likes + 1 : previous_likes - 1)
+                }
+            }
+        );
+    });
+{% endblock %}

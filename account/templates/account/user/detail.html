@@ -1,0 +1,62 @@
+{% extends 'base.html' %}{% load thumbnail %}
+{% block title %}{{ user.get_full_name }}{% endblock %}
+{% block content %}
+<h1>{{user.get_full_name}}</h1>    
+<hr>
+<div class="row">
+    <div class="col-md-6">
+        <div class="user-image">
+                <img src="{% thumbnail user.profile.photo 180x180 %}" alt="user picture">
+        </div>
+        {% with total_followers=user.followers.count %}
+        <div class="info">
+                {{ user.get_full_name }}
+        </div>
+    </div>
+    <div class="col-md-6">
+        <span class="count">
+            <span class="total">{{ total_followers }}</span>
+            Follower{{ total_followers|pluralize }}
+        </span>
+        <a href="#" data-id='{{user.id}}' data-action='{% if request.user in user.followers.all %}un{% endif %}follow' class="follow button">
+            {% if not request.user == user %}
+            {% if request.user in user.followers.all %}
+            Unfollow
+            {% else %}
+            Follow
+            {% endif %}
+            {% endif %}
+        </a>
+    </div>
+  
+    
+</div>
+<hr>
+<div class="image-container" id="image-list">
+    {% include 'images/image/list_ajax.html' with images=user.images_created.all %}
+</div>
+{% endwith %}
+{% endblock %}
+{% block domready %}
+    $('a.follow').click(function(e){
+        e.preventDefault();
+        $.post('{% url 'account:user_follow' %}',
+        {
+            'id' : $(this).data('id'),
+            'action' : $(this).data('action')
+        },
+        function(data){
+            if (data['status']=='ok'){
+                var previous_action = $('a.follow').data('action');
+                $('a.follow').data('action', previous_action == 'follow'? 'unfollow':'follow');
+          
+                $('a.follow').text(previous_action == 'follow'? 'unfollow':'follow');
+                var previous_followers = parseInt($('span.count .total').text());
+                $('span.count .total').text(previous_action == 'follow'? previous_followers + 1 : previous_followers - 1)
+        
+            }   
+        }
+        );
+    });
+    
+{% endblock %}
